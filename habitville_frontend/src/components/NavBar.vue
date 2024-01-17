@@ -14,7 +14,7 @@
 
 <style scoped>
     .navbar {
-    background-color: #2ecc71; /* Green background */
+    background-color: #a2e28b; 
     padding: 1rem;
     display: flex;
     justify-content: center;
@@ -23,7 +23,7 @@
     .navbar a,
     .navbar .inactive-link {
     margin: 0 10px;
-    color: white;
+    color: rgb(0, 0, 0);
     text-decoration: none;
     cursor: pointer;
     }
