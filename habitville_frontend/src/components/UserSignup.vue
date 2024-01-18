@@ -10,10 +10,15 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" required>
       </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" v-model="confirmPassword" required>
+      </div>
       <div class="form-group button-container">
         <button type="submit">Sign Up</button>
       </div>
     </form>
+    <p v-if="formError" class="error-message">{{ formError }}</p>
   </div>
 </template>
 
@@ -25,21 +30,35 @@
     data() {
       return {
         username: '',
-        password: ''
+        password: '',
+        confirmPassword: '',
+        formError: '', 
       };
     },
     methods: {
       handleSubmit() {
+        this.formError = '';
+
+        if(this.password !== this.confirmPassword) {
+          this.formError = "Passwords do not match."; 
+          return;
+        }
+        
         const userData = {
           username: this.username,
           password: this.password
         };
+        
         axios.post('http://127.0.0.1:8000/accounts/signup/', userData)
           .then(response => {
+            // TODO: Redirect to the login page
             console.log(response.data);
           })
           .catch(error => {
             console.error(error);
+            if (error.response) {
+              this.formError = error.response.data.detail || 'An error occurred. Please try again later.';
+            }
           });
       }
     }
