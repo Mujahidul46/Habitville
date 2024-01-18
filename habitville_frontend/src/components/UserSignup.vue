@@ -39,25 +39,56 @@
       handleSubmit() {
         this.formError = '';
 
-        if(this.password !== this.confirmPassword) {
-          this.formError = "Passwords do not match."; 
+        // Username checks
+        if(this.username.length < 3) {
+          this.formError = "Username must be at least 3 characters long.";
           return;
         }
-        
+        if(!this.username.match(/^[a-zA-Z0-9._]+$/)) {
+          this.formError = "Username can only contain alphanumeric characters, periods, and underscores.";
+          return;
+        }
+        if(!isNaN(this.username)) {
+          this.formError = "Username cannot be purely numerical.";
+          return;
+        }
+        // Password checks
+        if(this.password.length < 6) {
+          this.formError = "Password must be at least 6 characters long.";
+          return;
+        }
+
+        if(this.password === this.username) {
+          this.formError = "Password cannot be the same as the username.";
+          return;
+        }
+        if(this.password !== this.confirmPassword) {
+          this.formError = "Passwords do not match.";
+          return;
+        }
+
         const userData = {
           username: this.username,
           password: this.password
         };
         
+        // Post request to server with user data
         axios.post('http://127.0.0.1:8000/accounts/signup/', userData)
           .then(response => {
-            // TODO: Redirect to the login page
+            // TODO: Redirect to the login page or dashboard
             console.log(response.data);
           })
           .catch(error => {
             console.error(error);
             if (error.response) {
-              this.formError = error.response.data.detail || 'An error occurred. Please try again later.';
+              // checks if username already exists
+              if (error.response.status === 400 && error.response.data.username_exists) {
+                this.formError = error.response.data.message;
+              } else {
+                this.formError = error.response.data.detail || 'An error occurred. Please try again later.';
+              }
+            } else { // likely network issue/server down
+              this.formError = 'Cannot reach the server. Please check your network connection.';
             }
           });
       }

@@ -11,13 +11,20 @@ def signup_view(request):
     print("Signup_view is called")
     if request.method == 'POST':
         serializer = CustomUserSerializer(data=request.data)
-        data = {}
         if serializer.is_valid():
-            user = serializer.save() # creates a new user by calling the overridden create method in serializers.py 
-            data['response'] = "Successfully registered a new user."
-            data['username'] = user.username
+            user = serializer.save()  # creates a new user
+            return Response({
+                'response': "Successfully registered a new user.",
+                'username': user.username
+            })
         else:
-            data = serializer.errors # captures any errors and includes in response
-        return Response(data)
+            # Check if the username already exists
+            if 'username' in serializer.errors:
+                return Response({
+                    'username_exists': True, # flag to let frontend know if username exists
+                    'message': "A user with that username already exists."
+                }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # no longer need Login_view function as TokenObtainPairView in urls.py handles user authentication and token generation
