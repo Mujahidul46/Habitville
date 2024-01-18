@@ -10,7 +10,7 @@
           <label for="password">Password</label>
           <input type="password" id="password" v-model="password" required />
         </div>
-        <div class="form-group">
+        <div class="form-group button-container">
           <button type="submit">Login</button>
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
@@ -18,9 +18,9 @@
     </div>
   </template>
   
-  <script>
+<script>
   import axios from 'axios';
-  
+
   export default {
     name: 'UserLogin',
     data() {
@@ -51,49 +51,53 @@
       }
     }
   };
-  </script>
+</script>
   
-  
-  <style scoped>
+<style scoped>
   .login-container {
     max-width: 300px;
     margin: auto;
     padding: 20px;
   }
-  
+
   .form-group {
     margin-bottom: 15px;
   }
-  
+
   .form-group label {
     display: block;
     margin-bottom: 5px;
   }
-  
+
   .form-group input {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
   }
-  
-  .form-group button {
-    width: 100%;
-    padding: 10px;
-    background-color: #5cb85c;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+
+  .button-container {
+    display: flex;
+    justify-content: center; 
+    margin-bottom: 15px;
   }
-  
+
+.form-group button {
+  width: 25%;
+  padding: 10px;
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
   .form-group button:hover {
     background-color: #4cae4c;
   }
-  
+
   .error-message {
     color: red;
     text-align: center;
   }
-  </style>
-  
+</style>

@@ -10,7 +10,9 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" required>
       </div>
-      <button type="submit">Sign Up</button>
+      <div class="form-group button-container">
+        <button type="submit">Sign Up</button>
+      </div>
     </form>
   </div>
 </template>
@@ -45,33 +47,50 @@
 </script>
 
 <style scoped>
-  /* Add styles for your signup container here */
-  .signup-container {
-    max-width: 300px;
-    margin: auto;
-    padding: 20px;
-  }
+.signup-container {
+  max-width: 300px;
+  margin: auto;
+  padding: 20px;
+}
 
-  .form-group {
-    margin-bottom: 15px;
-  }
+.form-group {
+  margin-bottom: 15px;
+}
 
-  .form-group label {
-    display: block;
-  }
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
 
-  .form-group input {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-  }
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
 
-  button {
-    width: 100%;
-    padding: 10px;
-    background-color: #42b983;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
+.button-container {
+  display: flex;
+  justify-content: center; 
+  margin-bottom: 15px;
+}
+
+.form-group button {
+  width: 25%;
+  padding: 10px;
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-group button:hover {
+  background-color: #4cae4c;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+}
 </style>
