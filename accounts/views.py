@@ -20,14 +20,4 @@ def signup_view(request):
             data = serializer.errors # captures any errors and includes in response
         return Response(data)
 
-@api_view(['POST'])
-def login_view(request):
-    print("login_view is called")
-    username = request.data.get('username')
-    password = request.data.get('password')
-    user = authenticate(request, username=username, password=password)
-    if user is not None: # if user exists in database (authenticated)
-        login(request, user)
-        return Response(status=status.HTTP_200_OK)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# no longer need Login_view function as TokenObtainPairView in urls.py handles user authentication and token generation

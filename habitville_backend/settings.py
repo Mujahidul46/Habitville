@@ -43,7 +43,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts', ###################### Added this ######################
     'corsheaders', ###################### Added this ######################
+    'rest_framework_simplejwt', ###################### Added this ######################
 ]
+
+REST_FRAMEWORK = { ###################### Added this ######################
+    'DEFAULT_AUTHENTICATION_CLASSES': ( ###################### Added this ######################
+        'rest_framework_simplejwt.authentication.JWTAuthentication', ###################### Added this ######################
+    ) ###################### Added this ######################
+} ###################### Added this ######################
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -60,6 +68,8 @@ CORS_ALLOWED_ORIGINS = [ ###################### Added this #####################
     "http://localhost:8080",  # The port where Vue.js app is served  ###################### Added this ######################
     "http://127.0.0.1:8080", ###################### Added this ######################
 ]
+
+
 
 ROOT_URLCONF = 'habitville_backend.urls'
 

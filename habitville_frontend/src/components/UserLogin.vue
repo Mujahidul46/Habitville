@@ -33,15 +33,16 @@
     methods: {
       async submitLogin() {
         try {
-          const response = await axios.post('http://127.0.0.1:8000/accounts/login/', {
+          const response = await axios.post('http://127.0.0.1:8000/api/token/', {
             username: this.username,
             password: this.password
           });
-          if (response.status === 200) {
-            this.$router.push('/habits'); 
+          if (response.data.access) {
+            localStorage.setItem('userToken', response.data.access);
+            this.$router.push('/habits');
           }
         } catch (error) {
-          if (error.response && error.response.status === 404) {
+          if (error.response && error.response.status === 401) {
             this.errorMessage = 'Invalid username or password';
           } else {
             this.errorMessage = 'An error occurred. Please try again later.';
@@ -51,6 +52,7 @@
     }
   };
   </script>
+  
   
   <style scoped>
   .login-container {
