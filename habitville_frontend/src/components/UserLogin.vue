@@ -18,40 +18,50 @@
     </div>
   </template>
   
-<script>
+  <script>
+  import { ref } from 'vue';
   import axios from 'axios';
-
+  import { useAuth } from '../../useAuth.js'; 
+  import { useRouter } from 'vue-router';
+  
   export default {
-    name: 'UserLogin',
-    data() {
-      return {
-        username: '',
-        password: '',
-        errorMessage: ''
-      };
-    },
-    methods: {
-      async submitLogin() {
-        try {
-          const response = await axios.post('http://127.0.0.1:8000/api/token/', {
-            username: this.username,
-            password: this.password
-          });
-          if (response.data.access) {
-            localStorage.setItem('userToken', response.data.access);
-            this.$router.push('/habits');
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 401) {
-            this.errorMessage = 'Invalid username or password';
-          } else {
-            this.errorMessage = 'An error occurred. Please try again later.';
-          }
+  name: 'UserLogin',
+  setup() {
+    const router = useRouter(); 
+    const { login } = useAuth();
+    const username = ref('');
+    const password = ref('');
+    const errorMessage = ref('');
+
+    const submitLogin = async () => {
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+          username: username.value,
+          password: password.value
+        });
+        if (response.data.access) {
+          login(response.data.access); 
+          router.push('/habits'); // navigate to /habits URL
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          errorMessage.value = 'Invalid username or password';
+        } else {
+          errorMessage.value = 'An error occurred. Please try again later.';
         }
       }
-    }
-  };
+    };
+
+    return {
+      username,
+      password,
+      errorMessage,
+      submitLogin
+    };
+  }
+};
 </script>
+  
   
 <style scoped>
   .login-container {

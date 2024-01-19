@@ -23,83 +23,90 @@
 </template>
 
 <script>
-  import axios from 'axios';
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+import { useAuth } from '../../useAuth.js';
 
-  export default {
-    name: 'UserSignup',
-    data() {
-      return {
-        username: '',
-        password: '',
-        confirmPassword: '',
-        formError: '', 
-      };
-    },
-    methods: {
-      handleSubmit() {
-        this.formError = '';
+export default {
+  name: 'UserSignup',
+  setup() {
+    const router = useRouter(); 
+    const { login } = useAuth(); 
+    const username = ref('');
+    const password = ref('');
+    const confirmPassword = ref('');
+    const formError = ref('');
 
-        // Form validation - Username checks
-        if(this.username.length < 3) {
-          this.formError = "Username must be at least 3 characters long.";
-          return;
-        }
-        if(!this.username.match(/^[a-zA-Z0-9._]+$/)) {
-          this.formError = "Username can only contain alphanumeric characters, periods, and underscores.";
-          return;
-        }
-        if(!isNaN(this.username)) {
-          this.formError = "Username cannot be purely numerical.";
-          return;
-        }
-        // Form validation - Password checks
-        if(this.password.length < 6) {
-          this.formError = "Password must be at least 6 characters long.";
-          return;
-        }
+    const handleSubmit = async () => {
+      formError.value = '';
 
-        if(this.password === this.username) {
-          this.formError = "Password cannot be the same as the username.";
-          return;
-        }
-        if(this.password !== this.confirmPassword) {
-          this.formError = "Passwords do not match.";
-          return;
-        }
-
-        const userData = {
-          username: this.username,
-          password: this.password
-        };
-        
-        // Posts request to server with user data
-        axios.post('http://127.0.0.1:8000/accounts/signup/', userData)
-          .then(response => {
-            if (response.data.token) {
-              localStorage.setItem('userToken', response.data.token); // Saves the token
-              this.$router.push('/habits'); // Immediately redirects to the habits page after signing up
-            } else {
-              console.error('No token returned from server');
-              this.formError = 'Signup successful, but could not log you in automatically.';
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            if (error.response) {
-              // checks if username already exists
-              if (error.response.status === 400 && error.response.data.username_exists) {
-                this.formError = error.response.data.message;
-              } else {
-                this.formError = error.response.data.detail || 'An error occurred. Please try again later.';
-              }
-            } else { // likely network issue/server down
-              this.formError = 'Cannot reach the server. Please check your network connection.';
-            }
-          });
+      // Form validation - Username checks
+      if(username.value.length < 3) {
+        formError.value = "Username must be at least 3 characters long.";
+        return;
       }
-    }
-  };
+      if(!username.value.match(/^[a-zA-Z0-9._]+$/)) {
+        formError.value = "Username can only contain alphanumeric characters, periods, and underscores.";
+        return;
+      }
+      if(!isNaN(username.value)) {
+        formError.value = "Username cannot be purely numerical.";
+        return;
+      }
+      // Form validation - Password checks
+      if(password.value.length < 6) {
+        formError.value = "Password must be at least 6 characters long.";
+        return;
+      }
+
+      if(password.value === username.value) {
+        formError.value = "Password cannot be the same as the username.";
+        return;
+      }
+      if(password.value !== confirmPassword.value) {
+        formError.value = "Passwords do not match.";
+        return;
+      }
+
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/accounts/signup/', {
+          username: username.value,
+          password: password.value
+        });
+        if (response.data.token) {
+          login(response.data.token); 
+          router.push('/habits'); // Redirects to the habits page immediately after signing up - skips unnecessary login
+        } else {
+          console.error('No token returned from server');
+          formError.value = 'Signup successful, but could not log you in automatically.';
+        }
+      } catch (error) {
+        console.error(error);
+        if (error.response) {
+          // checks if username already exists
+          if (error.response.status === 400 && error.response.data.username_exists) {
+            formError.value = error.response.data.message;
+          } else {
+            formError.value = error.response.data.detail || 'An error occurred. Please try again later.';
+          }
+        } else { // likely network issue/server down
+          formError.value = 'Cannot reach the server. Please check your network connection.';
+        }
+      }
+    };
+
+    return {
+      username,
+      password,
+      confirmPassword,
+      formError,
+      handleSubmit,
+    };
+  }
+};
 </script>
+
 
 <style scoped>
 .signup-container {
