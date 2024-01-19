@@ -39,7 +39,7 @@
       handleSubmit() {
         this.formError = '';
 
-        // Username checks
+        // Form validation - Username checks
         if(this.username.length < 3) {
           this.formError = "Username must be at least 3 characters long.";
           return;
@@ -52,7 +52,7 @@
           this.formError = "Username cannot be purely numerical.";
           return;
         }
-        // Password checks
+        // Form validation - Password checks
         if(this.password.length < 6) {
           this.formError = "Password must be at least 6 characters long.";
           return;
@@ -72,11 +72,16 @@
           password: this.password
         };
         
-        // Post request to server with user data
+        // Posts request to server with user data
         axios.post('http://127.0.0.1:8000/accounts/signup/', userData)
           .then(response => {
-            // TODO: Redirect to the login page or dashboard
-            console.log(response.data);
+            if (response.data.token) {
+              localStorage.setItem('userToken', response.data.token); // Saves the token
+              this.$router.push('/habits'); // Immediately redirects to the habits page after signing up
+            } else {
+              console.error('No token returned from server');
+              this.formError = 'Signup successful, but could not log you in automatically.';
+            }
           })
           .catch(error => {
             console.error(error);
