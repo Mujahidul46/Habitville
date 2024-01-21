@@ -1,19 +1,39 @@
 <template>
-    <nav class="navbar">
-      <!-- Links available (not logged in) -->
+  <nav class="navbar">
+    <!-- Links when the user is not logged in -->
+    <template v-if="!isAuthenticated">
       <router-link to="/">Home</router-link>
       <router-link to="/signup">Signup</router-link>
       <router-link to="/login">Login</router-link>
-  
-      <!-- TO DO: add links here for authenticated users -->
-    </nav>
-  </template>
-  
-  <script>
-  export default {
-    name: 'NavBar',
-  };
-  </script>
+    </template>
+
+    <!-- Links when the user is logged in -->
+    <template v-if="isAuthenticated">
+      <router-link to="/habits">Habit Tracker</router-link>
+      <router-link to="/profile">Profile</router-link>
+      <button @click="logout">Logout</button>
+    </template>
+  </nav>
+</template>
+
+<script>
+import { store, setAuth } from '@/store'; 
+
+export default {
+  name: 'NavBar',
+  computed: {
+    isAuthenticated() {
+      return store.isAuthenticated; 
+    }
+  },
+  methods: {
+    logout() {
+      setAuth('false'); 
+      this.$router.push('/login');     
+    }
+  }
+};
+</script>
   
   <style scoped>
     .navbar {

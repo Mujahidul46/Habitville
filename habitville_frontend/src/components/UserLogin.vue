@@ -23,6 +23,7 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Cookies from 'js-cookie';
+import { setAuth } from '@/store'; 
 
 export default {
   name: 'UserLogin',
@@ -35,7 +36,6 @@ export default {
     const submitLogin = async () => {
       try {
         const csrfToken = Cookies.get('csrftoken');
-
         console.log("CSRF Token:", csrfToken);
         const response = await axios.post('http://127.0.0.1:8000/accounts/login/', {
           username: username.value,
@@ -48,8 +48,8 @@ export default {
         });
 
         if (response.status === 200) {
-          localStorage.setItem('isAuthenticated', 'true');
-          router.push('/habits'); // Redirects to '/habits' upon successful login
+          setAuth('true'); 
+          router.push('/habits'); // successful login - redirect to /habits url
         }
       } catch (error) {
         if (error.response) {
@@ -69,6 +69,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .login-container {
