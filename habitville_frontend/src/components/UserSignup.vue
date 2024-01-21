@@ -3,95 +3,59 @@
     <h1>Sign Up</h1>
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" v-model="username" required>
+        <label for="username">Username:</label>
+        <input type="text" id="username" v-model="username" required />
       </div>
       <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" v-model="password" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" v-model="password" required />
       </div>
       <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" id="confirmPassword" v-model="confirmPassword" required>
+        <label for="confirmPassword">Confirm Password:</label>
+        <input type="password" id="confirmPassword" v-model="confirmPassword" required />
       </div>
       <div class="form-group button-container">
         <button type="submit">Sign Up</button>
       </div>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </form>
-    <p v-if="formError" class="error-message">{{ formError }}</p>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
 import axios from 'axios';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuth } from '../../useAuth.js';
 
 export default {
   name: 'UserSignup',
   setup() {
-    const router = useRouter(); 
-    const { login } = useAuth(); 
+    const router = useRouter();
     const username = ref('');
     const password = ref('');
     const confirmPassword = ref('');
-    const formError = ref('');
+    const errorMessage = ref('');
 
     const handleSubmit = async () => {
-      formError.value = '';
+      errorMessage.value = '';
 
-      // Form validation - Username checks
-      if(username.value.length < 3) {
-        formError.value = "Username must be at least 3 characters long.";
+      if (password.value !== confirmPassword.value) {
+        errorMessage.value = 'Passwords do not match.';
         return;
       }
-      if(!username.value.match(/^[a-zA-Z0-9._]+$/)) {
-        formError.value = "Username can only contain alphanumeric characters, periods, and underscores.";
-        return;
-      }
-      if(!isNaN(username.value)) {
-        formError.value = "Username cannot be purely numerical.";
-        return;
-      }
-      // Form validation - Password checks
-      if(password.value.length < 6) {
-        formError.value = "Password must be at least 6 characters long.";
-        return;
-      }
-
-      if(password.value === username.value) {
-        formError.value = "Password cannot be the same as the username.";
-        return;
-      }
-      if(password.value !== confirmPassword.value) {
-        formError.value = "Passwords do not match.";
-        return;
-      }
-
       try {
         const response = await axios.post('http://127.0.0.1:8000/accounts/signup/', {
           username: username.value,
           password: password.value
         });
-        if (response.data.token) {
-          login(response.data.token); 
-          router.push('/habits'); // Redirects to the habits page immediately after signing up - skips unnecessary login
-        } else {
-          console.error('No token returned from server');
-          formError.value = 'Signup successful, but could not log you in automatically.';
+        if (response.status === 200) {
+          router.push('/login');
         }
       } catch (error) {
-        console.error(error);
         if (error.response) {
-          // checks if username already exists
-          if (error.response.status === 400 && error.response.data.username_exists) {
-            formError.value = error.response.data.message;
-          } else {
-            formError.value = error.response.data.detail || 'An error occurred. Please try again later.';
-          }
-        } else { // likely network issue/server down
-          formError.value = 'Cannot reach the server. Please check your network connection.';
+          errorMessage.value = error.response.data.detail || 'An error occurred. Please try again later.';
+        } else {
+          errorMessage.value = 'An error occurred. Please try again later.';
         }
       }
     };
@@ -100,13 +64,12 @@ export default {
       username,
       password,
       confirmPassword,
-      formError,
-      handleSubmit,
+      errorMessage,
+      handleSubmit
     };
   }
 };
 </script>
-
 
 <style scoped>
 .signup-container {
@@ -133,12 +96,10 @@ export default {
 
 .button-container {
   display: flex;
-  justify-content: center; 
-  margin-bottom: 15px;
+  justify-content: center;
 }
 
 .form-group button {
-  width: 25%;
   padding: 10px;
   background-color: #5cb85c;
   color: white;

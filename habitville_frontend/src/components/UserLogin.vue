@@ -1,50 +1,58 @@
 <template>
-    <div class="login-container">
-      <h1>Login</h1>
-      <form @submit.prevent="submitLogin">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" v-model="username" required />
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" v-model="password" required />
-        </div>
-        <div class="form-group button-container">
-          <button type="submit">Login</button>
-        </div>
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-      </form>
-    </div>
-  </template>
-  
-  <script>
-  import { ref } from 'vue';
-  import axios from 'axios';
-  import { useAuth } from '../../useAuth.js'; 
-  import { useRouter } from 'vue-router';
-  
-  export default {
+  <div class="login-container">
+    <h1>Login</h1>
+    <form @submit.prevent="submitLogin">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" v-model="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" v-model="password" required />
+      </div>
+      <div class="form-group button-container">
+        <button type="submit">Login</button>
+      </div>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+    </form>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import Cookies from 'js-cookie';
+
+export default {
   name: 'UserLogin',
   setup() {
-    const router = useRouter(); 
-    const { login } = useAuth();
+    const router = useRouter();
     const username = ref('');
     const password = ref('');
     const errorMessage = ref('');
 
     const submitLogin = async () => {
       try {
-        const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+        const csrfToken = Cookies.get('csrftoken');
+
+        console.log("CSRF Token:", csrfToken);
+        const response = await axios.post('http://127.0.0.1:8000/accounts/login/', {
           username: username.value,
           password: password.value
+        }, {
+          headers: {
+            'X-CSRFToken': csrfToken
+          },
+          withCredentials: true
         });
-        if (response.data.access) {
-          login(response.data.access); 
-          router.push('/habits'); // navigate to /habits URL
+
+        if (response.status === 200) {
+          localStorage.setItem('isAuthenticated', 'true');
+          router.push('/habits'); // Redirects to '/habits' upon successful login
         }
       } catch (error) {
-        if (error.response && error.response.status === 401) {
+        if (error.response) {
           errorMessage.value = 'Invalid username or password';
         } else {
           errorMessage.value = 'An error occurred. Please try again later.';
@@ -61,39 +69,36 @@
   }
 };
 </script>
-  
-  
+
 <style scoped>
-  .login-container {
-    max-width: 300px;
-    margin: auto;
-    padding: 20px;
-  }
+.login-container {
+  max-width: 300px;
+  margin: auto;
+  padding: 20px;
+}
 
-  .form-group {
-    margin-bottom: 15px;
-  }
+.form-group {
+  margin-bottom: 15px;
+}
 
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-  }
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
 
-  .form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
 
-  .button-container {
-    display: flex;
-    justify-content: center; 
-    margin-bottom: 15px;
-  }
+.button-container {
+  display: flex;
+  justify-content: center;
+}
 
 .form-group button {
-  width: 25%;
   padding: 10px;
   background-color: #5cb85c;
   color: white;
@@ -102,12 +107,12 @@
   cursor: pointer;
 }
 
-  .form-group button:hover {
-    background-color: #4cae4c;
-  }
+.form-group button:hover {
+  background-color: #4cae4c;
+}
 
-  .error-message {
-    color: red;
-    text-align: center;
-  }
+.error-message {
+  color: red;
+  text-align: center;
+}
 </style>

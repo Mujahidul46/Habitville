@@ -27,10 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-###################### Stuff I added ######################
-AUTH_USER_MODEL = 'accounts.CustomUser'
 
-###########################################################
+AUTH_USER_MODEL = 'accounts.CustomUser' ###################### Added this ######################
+
 
 # Application definition
 
@@ -43,14 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts', ###################### Added this ######################
     'corsheaders', ###################### Added this ######################
-    'rest_framework_simplejwt', ###################### Added this ######################
 ]
-
-REST_FRAMEWORK = { ###################### Added this ######################
-    'DEFAULT_AUTHENTICATION_CLASSES': ( ###################### Added this ######################
-        'rest_framework_simplejwt.authentication.JWTAuthentication', ###################### Added this ######################
-    ) ###################### Added this ######################
-} ###################### Added this ######################
 
 
 MIDDLEWARE = [
@@ -69,7 +61,11 @@ CORS_ALLOWED_ORIGINS = [ ###################### Added this #####################
     "http://127.0.0.1:8080", ###################### Added this ######################
 ]
 
-
+CORS_ALLOW_CREDENTIALS = True ###################### Added this ######################
+CSRF_COOKIE_SECURE = False ###################### Added this ######################
+SESSION_COOKIE_SECURE = False ###################### Added this ######################
+CSRF_COOKIE_HTTPONLY = False ###################### Added this ######################
+SESSION_COOKIE_HTTPONLY = True ###################### Added this ######################
 
 ROOT_URLCONF = 'habitville_backend.urls'
 

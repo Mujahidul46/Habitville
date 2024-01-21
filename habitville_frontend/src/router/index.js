@@ -25,18 +25,17 @@ const router = createRouter({
     {
       path: '/habits',
       name: 'HabitTracker',
-      component: HabitTracker
+      component: HabitTracker,
+      meta: { requiresAuth: true }
     },
   ]
 });
 
 router.beforeEach((to, from, next) => {
-  const userIsAuthenticated = !!localStorage.getItem('userToken');
+  const isAuthenticated = localStorage.getItem('isAuthenticated');
 
-  if (!userIsAuthenticated && to.name === 'HabitTracker') {
+  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
     next({ name: 'UserLogin' });
-  } else if (userIsAuthenticated && (to.name === 'UserLogin' || to.name === 'UserSignup')) {
-    next({ name: 'HabitTracker' });
   } else {
     next();
   }
