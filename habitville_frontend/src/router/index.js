@@ -4,7 +4,7 @@ import UserSignup from '@/components/UserSignup.vue';
 import UserLogin from '@/components/UserLogin.vue';
 import HabitTracker from '@/components/HabitTracker.vue';
 import UserProfile from '@/components/UserProfile.vue';
-import { store, setAuth } from '@/store';
+import { store } from '@/store';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -44,12 +44,12 @@ router.beforeEach((to, from, next) => {
     if (store.isAuthenticated) {
       next();
     } else {
-      setAuth('false'); 
       next({ name: 'UserLogin' });
     }
   } else {
     next();
   }
 });
+
 
 export default router;

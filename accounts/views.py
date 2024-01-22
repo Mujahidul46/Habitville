@@ -47,3 +47,21 @@ def logout_view(request):
     logout(request)
     return Response({'response': 'Successfully logged out.'})
 
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def user_profile_view(request):
+    if request.method == 'GET':
+        serializer = CustomUserSerializer(request.user)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = CustomUserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'response': 'Profile updated successfully', 'user': serializer.data})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+# In your Django views.py
+@api_view(['GET'])
+def verify_session(request):
+    return Response({'isAuthenticated': request.user.is_authenticated})
