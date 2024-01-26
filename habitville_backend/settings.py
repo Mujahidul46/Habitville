@@ -67,6 +67,10 @@ SESSION_COOKIE_SECURE = False ###################### Added this ################
 CSRF_COOKIE_HTTPONLY = False ###################### Added this ######################
 SESSION_COOKIE_HTTPONLY = True ###################### Added this ######################
 
+CSRF_COOKIE_SAMESITE = 'None' ###################### Added this ######################
+SESSION_COOKIE_SAMESITE = 'None' ###################### Added this ######################
+
+
 ROOT_URLCONF = 'habitville_backend.urls'
 
 TEMPLATES = [

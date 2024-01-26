@@ -7,21 +7,15 @@
 
 <script>
 import NavBar from './components/NavBar.vue'
-import axios from 'axios'
-import { setAuth } from './store' 
+import store from './store'
 
 export default {
   name: 'App',
-  components: { NavBar },
+  components: {
+    NavBar
+  },
   created() {
-    axios.get('http://127.0.0.1:8000/accounts/verify-session/', { withCredentials: true })
-      .then(response => {
-        // Update the authentication state based on the response
-        setAuth(response.data.isAuthenticated ? 'true' : 'false');
-      })
-      .catch(() => {
-        setAuth('false');
-      });
+    store.dispatch('checkAuth');
   }
 }
 </script>
@@ -35,8 +29,8 @@ html, body {
 
 #app {
   min-height: 100%;
-  background-color: hsl(104, 67%, 77%); 
-  color: #333; 
+  background-color: hsl(104, 67%, 77%);
+  color: #333;
   font-family: 'Open Sans', Arial, sans-serif;
 }
 </style>

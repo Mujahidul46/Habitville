@@ -3,8 +3,7 @@ import HomePage from '@/components/HomePage.vue';
 import UserSignup from '@/components/UserSignup.vue';
 import UserLogin from '@/components/UserLogin.vue';
 import HabitTracker from '@/components/HabitTracker.vue';
-import UserProfile from '@/components/UserProfile.vue';
-import { store } from '@/store';
+import store from '@/store'; 
 
 const router = createRouter({
   history: createWebHistory(),
@@ -30,26 +29,19 @@ const router = createRouter({
       component: HabitTracker,
       meta: { requiresAuth: true }
     },
-    {
-      path: '/profile',
-      name: 'UserProfile',
-      component: UserProfile,
-      meta: { requiresAuth: true }
-    },
   ]
 });
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.isAuthenticated) {
-      next();
-    } else {
+    if (!store.getters.isAuthenticated) {
       next({ name: 'UserLogin' });
+    } else {
+      next();
     }
   } else {
     next();
   }
 });
-
 
 export default router;

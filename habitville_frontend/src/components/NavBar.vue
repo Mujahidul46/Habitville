@@ -10,54 +10,56 @@
     <!-- Links when the user is logged in -->
     <template v-if="isAuthenticated">
       <router-link to="/habits">Habit Tracker</router-link>
-      <router-link to="/profile">Profile</router-link>
       <button @click="logout">Logout</button>
     </template>
   </nav>
 </template>
 
 <script>
-import { store, setAuth } from '@/store'; 
+import { mapGetters } from 'vuex'; 
 
 export default {
   name: 'NavBar',
   computed: {
-    isAuthenticated() {
-      return store.isAuthenticated; 
-    }
+    ...mapGetters(['isAuthenticated', 'username'])
   },
   methods: {
     logout() {
-      localStorage.removeItem('isAuthenticated');
-      setAuth('false'); 
-      this.$router.push('/login');     
+      this.$store.dispatch('logout').then(() => {
+        this.$router.push('/');
+      }).catch(error => {
+        console.error('Logout failed:', error);
+      });
     }
+  },
+  created() {
+    this.$store.dispatch('checkAuth');
   }
 };
 </script>
-  
-  <style scoped>
-    .navbar {
-      background-color: #a2e28b;
-      padding: 1rem;
-      display: flex;
-      justify-content: center;
-    }
-  
-    .navbar a, .navbar button {
-      margin: 0 10px;
-      color: rgb(0, 0, 0);
-      text-decoration: none;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-      font: inherit;
-    }
-  
-    .navbar a.router-link-exact-active,
-    .navbar a:hover {
-      text-decoration: underline;
-    }
-  </style>
+
+<style scoped>
+  .navbar {
+    background-color: #a2e28b;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .navbar a, .navbar button {
+    margin: 0 10px;
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+  }
+
+  .navbar a.router-link-exact-active,
+  .navbar a:hover {
+    text-decoration: underline;
+  }
+</style>
   

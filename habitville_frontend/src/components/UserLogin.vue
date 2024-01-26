@@ -19,43 +19,30 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { ref } from 'vue';
+import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import Cookies from 'js-cookie';
-import { setAuth } from '@/store'; 
 
 export default {
   name: 'UserLogin',
   setup() {
+    const store = useStore();
     const router = useRouter();
     const username = ref('');
     const password = ref('');
-    const errorMessage = ref('');
+    const errorMessage = ref(null);
 
     const submitLogin = async () => {
       try {
-        const csrfToken = Cookies.get('csrftoken');
-        console.log("CSRF Token:", csrfToken);
-        const response = await axios.post('http://127.0.0.1:8000/accounts/login/', {
+        await store.dispatch('login', {
           username: username.value,
           password: password.value
-        }, {
-          headers: {
-            'X-CSRFToken': csrfToken
-          },
-          withCredentials: true
         });
-
-        if (response.status === 200) {
-          setAuth('true'); 
-          router.push('/habits'); // successful login - redirect to /habits url
-        }
+        router.push('/habits');
       } catch (error) {
-        if (error.response) {
-          errorMessage.value = 'Invalid username or password';
-        } else {
-          errorMessage.value = 'An error occurred. Please try again later.';
+        errorMessage.value = 'Login failed. Please try again.';
+        if (error.response && error.response.data && error.response.data.error) {
+          errorMessage.value = error.response.data.error;
         }
       }
     };
@@ -69,7 +56,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 .login-container {

@@ -1,18 +1,15 @@
-from django.shortcuts import render
-from rest_framework import status
+from django.contrib.auth import authenticate, login
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import authenticate, login, logout
+from rest_framework import status
 from .serializers import CustomUserSerializer
-from django.contrib.auth.models import User
 
 @api_view(['POST'])
 def signup_view(request):
     if request.method == 'POST':
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()  # creates a new user
+            serializer.save()  
             return Response({
                 'response': "Successfully registered a new user.",
                 'username': serializer.data.get('username')
@@ -22,46 +19,15 @@ def signup_view(request):
 
 @api_view(['POST'])
 def login_view(request):
-    # Gets username and password from the request data
-    username = request.data.get('username')
-    password = request.data.get('password')
-
-    print("Username:", username)
-    print("Password:", password)
-
-    user = authenticate(request, username=username, password=password)
-    print("User authenticated:", user is not None)
-
-    
-    if user is not None: # If authentication successful, log user in 
-        login(request, user)
-        print("User logged in:", request.user.is_authenticated)
-        return Response({'response': 'Successfully logged in.'})
-    else:
-        print("Login failed")
-        return Response({'response': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def logout_view(request):
-    logout(request)
-    return Response({'response': 'Successfully logged out.'})
-
-@api_view(['GET', 'PUT'])
-@permission_classes([IsAuthenticated])
-def user_profile_view(request):
-    if request.method == 'GET':
-        serializer = CustomUserSerializer(request.user)
-        return Response(serializer.data)
-    elif request.method == 'PUT':
-        serializer = CustomUserSerializer(request.user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'response': 'Profile updated successfully', 'user': serializer.data})
+    if request.method == 'POST':
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return Response({
+                'response': "Successfully logged in.",
+                'username': username
+            })
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-# In your Django views.py
-@api_view(['GET'])
-def verify_session(request):
-    return Response({'isAuthenticated': request.user.is_authenticated})
+            return Response({"error": "Invalid username or password"}, status=status.HTTP_401_UNAUTHORIZED)
