@@ -8,4 +8,6 @@ const app = createApp(App);
 app.use(router);
 app.use(store);
 
-app.mount('#app');
+store.dispatch('checkAuth').then(() => {
+  app.mount('#app');
+});
